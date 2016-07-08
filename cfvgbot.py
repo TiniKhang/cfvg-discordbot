@@ -13,6 +13,7 @@ import logging
 import discord
 import asyncio #time/wait stuff
 import math
+import interpret
 from fractions import *
 from Hyper_Calculator import * #Math stuff
 
@@ -31,80 +32,58 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	if message.content.startswith('Hi bot!'):
+	if message.content.startswith('Hi bot!') and message.server == None:
 		await client.send_message(message.author, 'Hey!')
 
-	if message.content.startswith('`'):	
-		tmp = await client.send_message(message.channel, 'Calculating...')
-
+	if message.content.startswith('vbot eval '):	
 		def parse_eq(data):
-			tmp = data
 			try:
-				tmp = parse_hgcc(tmp)
-				tmp = parse_ao(tmp)
+				data = parse_space(data)
+				data = parse_hgcc(data)
+				data = interpret.parse(data)
 			except:
-				tmp =  "ERROR"
-			return tmp
-		
-		def parse_ao(data):
-			tmp = data
-			while True:
-				a = tmp.find('AND')
-				o = tmp.find('OR')
-				if a == -1 and o == -1: break #If neither operator was found
-				if (a < o and a != -1) or o == -1 : # AND is found
-					at = tmp.find('AND',a+1)
-					ot = tmp.find('OR',a+1)
-					if at == -1 and ot == -1: #No more found
-						v = tmp.split('AND')
-						r = float(v[0])*float(v[1])
-						tmp = r
-						break
-					elif (at < ot and at != -1) or ot == -1: # AND is found
-						v = tmp[:at].split('AND')
-						r = float(v[0])*float(v[1])
-						tmp = tmp.replace(tmp[:at],str(r))
-					else:
-						v = tmp[:ot].split('AND')
-						r = float(v[0])*float(v[1])
-						tmp = tmp.replace(tmp[:ot],str(r))
-				else:
-					at = tmp.find('AND',o+1)
-					ot = tmp.find('OR',o+1)
-					if at == -1 and ot == -1:
-						v = tmp.split('OR')
-						r = float(v[0])+float(v[1]) - float(v[0])*float(v[1])
-						tmp = r
-						break
-					elif (at < ot and at != -1) or ot == -1: # AND is found
-						v = tmp[:at].split('OR')
-						r = float(v[0])+float(v[1]) - float(v[0])*float(v[1])
-						tmp = tmp.replace(tmp[:at],str(r))
-					else:
-						v = tmp[:ot].split('OR')
-						r = float(v[0])+float(v[1]) - float(v[0])*float(v[1])
-						tmp = tmp.replace(tmp[:ot],str(r))
-			return tmp
-			
+				data =  "ERROR"
+			return data
+
 		def parse_hgcc(data):
-			tmp = data
 			while True:
-				s = tmp.find('!')
+				s = data.find('!')
 				if s != -1:
-					e = tmp.find(' ',s)
-					if e == -1: v = tmp[s:] #if there is no space 
-					else: v = tmp[s:e]
+					e = data.find(" ",s+1)
+					if e == -1: v = data[s:] #reached end of equation
+					else: v = data[s:e]
 					t = v.split(',')
 					result = HGCC(int(t[2]),int(t[1]),int(t[0][1:]),int(t[3]),find=">=")
-					tmp = tmp.replace(v,str(float(result)))
+					data = data.replace(v,str(float(result)))
 				else:
 					break
-			return tmp
-				
+			return data
 		
-		data = message.content[len('"'):].strip()
+		def parse_space(data):
+			data = data.replace("AND",'&')
+			data = data.replace("XOR",'^')
+			data = data.replace("OR",'|')
+			for i in ['&','|','^','+','-','*','/',')','(']:	data = data.replace(i,' '+i+' ')
+			return data
+
+		data = message.content[len('vbot eval '):].strip()
 		result = parse_eq(data)
-		await client.edit_message(tmp, '{} the result for {}\n{}'.format(message.author.mention,data,result))
+		await client.send_message(message.channel, '{} the result for {} is: \n{}'.format(message.author.mention,data,result))
+		
+	if message.content.startswith('vbot hgcc '):
+		data = message.content[len('vbot HGCC '):].strip()
+		t = data.split(' ')
+		try:
+			result = HGCC(int(t[2]),int(t[1]),int(t[0]),int(t[3]),find=t[4])
+		except:
+			result = '''ERROR. Enter command as: vbot hgcc a b c d f
+	a:=Sample size
+	b:=Possible successes
+	c:=Population size
+	d:=Number of successes
+	f:=Available inputs (no quotes): '<' , '<=' , '>' , '>=' , '='
+	'''
+		await client.send_message(message.channel, '{} HGCC({},{},{},{},{})={}',message.author.mention,t[2],t[1],t[0],t[3],t[4],result)
 	
 @client.event
 async def on_ready():
