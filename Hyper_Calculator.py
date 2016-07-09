@@ -84,12 +84,16 @@ def quickodds(a,b,c,d):
     c: Sample size
     d: # of successes
     '''
-    print("              Chance to get exactly {}: {}".format(d,HGCC(a,b,c,d,find="=")))
-    print("                Chance to less than {}: {}".format(d,HGCC(a,b,c,d,find="<")))
-    print("Chance to get less than or equal to {}: {}".format(d,HGCC(a,b,c,d,find="<=")))
-    print("                Chance to more than {}: {}".format(d,HGCC(a,b,c,d,find=">")))
-    print("Chance to get more than or equal to {}: {}".format(d,HGCC(a,b,c,d,find=">=")))
+    tmp = "\n"
+    tmp += "Chance to get exactly {}: {}\n".format(d,HGCC(a,b,c,d,find="="))
+    tmp += "Chance to less than {}: {}\n".format(d,HGCC(a,b,c,d,find="<"))
+    tmp += "Chance to get less than or equal to {}: {}\n".format(d,HGCC(a,b,c,d,find="<="))
+    tmp += "Chance to more than {}: {}\n".format(d,HGCC(a,b,c,d,find=">"))
+    tmp += "Chance to get more than or equal to {}: {}\n".format(d,HGCC(a,b,c,d,find=">="))
+    return tmp
 
 def cascadeodds(a,b,c):
     '''Print exact odds for each # of successes'''
-    for i in range(0,c+1): print("Chance to get exactly {}: {}".format(i,HGC(a,b,c,i)))
+    tmp = ""
+    for i in range(0,c+1): tmp += "Chance to get exactly {}: {}\n".format(i,HGC(a,b,c,i))
+    return tmp
