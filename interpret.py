@@ -50,13 +50,13 @@ RIGHT_ASSOC = 1
 
 #Supported operators
 OPERATORS = {
-	'+' : (0, LEFT_ASSOC),
-	'-' : (0, LEFT_ASSOC),
-	'*' : (5, LEFT_ASSOC),
-	'/' : (5, LEFT_ASSOC),
-	'&' : (5, RIGHT_ASSOC),
-	'|' : (10, RIGHT_ASSOC),
-	'^' : (10, RIGHT_ASSOC)
+	'+' : (5, LEFT_ASSOC),
+	'-' : (5, LEFT_ASSOC),
+	'*' : (10, LEFT_ASSOC),
+	'/' : (10, LEFT_ASSOC),
+	'&' : (0, LEFT_ASSOC),
+	'|' : (0, LEFT_ASSOC),
+	'^' : (0, LEFT_ASSOC)
 }
 
 #Test if a certain token is operator
@@ -120,6 +120,9 @@ def parse_pre(data):
 	data = data.replace("AND",'&')
 	data = data.replace("XOR",'^')
 	data = data.replace("OR",'|')
+	data = data.replace("and",'&')
+	data = data.replace("xor",'^')
+	data = data.replace("or",'|')
 	for i in ['&','|','^','+','-','*','/',')','(']:	data = data.replace(i,' '+i+' ')
 	return data
 

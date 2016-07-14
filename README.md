@@ -1,4 +1,4 @@
-# cfvg-discordbot
+# cfvg-discordbot (Version: 0.2)
 Discord Bot for Cardfight Vanguard
 
 ### Running locally
@@ -9,3 +9,12 @@ Discord Bot for Cardfight Vanguard
 3. Clone or Download then extract this repository
 4. Create a new file called "token.key", then paste the token generated from step 3 into the file (one line only).
 5. Run cfvgbot.py
+
+### Features
+
+ - Hypergeometric Calculator for calculating card probabilities
+   - accepts BEDMAS operations using a shunting yard algorithm and reverse polish notation (rpn) interpreter, with custom operators
+   - avoids standard "eval" for safety
+ - Card Effects
+   - submits a search request to cf-vanguard.com/cardlist
+   - pulls data from the cf-vanguard card page
