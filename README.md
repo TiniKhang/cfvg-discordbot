@@ -9,6 +9,11 @@ Discord Bot for Cardfight Vanguard
 3. Clone or Download then extract this repository
 4. Create a new file called "token.key", then paste the token generated from step 3 into the file (one line only).
 5. Run cfvgbot.py
+6. The vanguard database is not installed by default. Run this to get the most recent:
+   '''
+   import getcardinfo
+   getcardinfo.updatedb(True)
+   '''
 
 ### Features
 

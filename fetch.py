@@ -1,3 +1,4 @@
+# DEPRECIATED -> use getcardinfo.py instead
 import urllib
 import urllib.request as urllib2
 import requests

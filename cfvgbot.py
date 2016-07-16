@@ -18,7 +18,7 @@ import interpret
 import text # words
 from fractions import *
 from Hyper_Calculator import * #Math stuff
-import fetch #card fetcher
+import getcardinfo as fetch #card fetcher
 
 token = "" #Create a text file named token.key and put your token in it
 with open('token.key', 'r') as myfile:
@@ -48,7 +48,7 @@ async def on_message(message):
 			break
 		print("{} searched for:{}".format(message.author,tmc[lead+2:lag].encode("utf-8")))
 		msg = await client.send_message(message.channel, 'Searching...')
-		result = fetch.cardget(tmc[lead+2:lag])
+		result = fetch.cardresult(tmc[lead+2:lag])
 		await client.edit_message(msg, result)
 		tmc = tmc.replace(tmc[lead:lag+2],"")
 		print('sent @{}:{}'.format(message.channel, result.encode("utf-8")))
