@@ -38,10 +38,13 @@ def updatedb(confirm):
 	url = "/wiki/Category:Cards"
 	basic = re.compile('[^0-9a-zA-Z ]+') # remove for pretty database
 	while True:
+		skip = False
 		r = requests.post("http://cardfight.wikia.com"+url)
 		soup = BeautifulSoup(r.content, 'html.parser', from_encoding=r.encoding) #utf-8
 		next = soup.find_all(string="next 200")
-		if not next: break
+		if not next:
+			next = soup.find_all(string="previous 200")
+			skip = True
 		table = next[0].find_parent("div").select(".mw-content-ltr")[0]
 		linkset = table.select("a")
 		for link in linkset:
@@ -52,7 +55,10 @@ def updatedb(confirm):
 			card += 1
 			database[name] = link["href"]
 			#print("registered: " + str(link["href"].encode('utf-8')) )
+
+		if skip: break
 		url = next[0].parent["href"]
+		
 
 	with open("vanguard.db", "wb") as file:
 		pickle.dump(database,file)
@@ -66,8 +72,14 @@ def fetchcard(page):
 	def f(a):
 		return(table[0].findAll("td",text = a)[0].next_sibling.text[1:-1])
 
-	effect = soup.select(".cftable .info-extra .effect tr:nth-of-type(2) td")[0].text[1:-1]
-	return("**{}**\n*{} <<{}>> {}*\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),effect))
+	effect = soup.select(".cftable .info-extra .effect tr:nth-of-type(2) td")
+	if effect:
+		for br in effect[0].find_all("br"):
+			br.replace_with("\n")
+		e = effect[0].text[1:-1]
+	else:
+		e = "*No effect*"
+	return("**{}**\n*{} <<{}>> {}*\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),e))
 	
 def cardresult(text):
 	d = searchdb(text,14)

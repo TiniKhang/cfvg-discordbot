@@ -1,6 +1,7 @@
 # Custom
 token.key
 vanguard.db
+vanguard.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
