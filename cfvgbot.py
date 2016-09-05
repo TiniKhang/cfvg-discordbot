@@ -1,11 +1,11 @@
 # V-mundi bot
 # -----------
 # Author: Nanosmasher
-# Date: 14/07/16
-# Version: 0.2
+# Date: 05/09/16
+# Version: 0.4
 # Features:
 # - Hypergeometric Calculator
-# - card effects
+# - card effects and images
 # TODO:
 # - vmundi decklists
 # other shit
@@ -48,7 +48,12 @@ async def on_message(message):
 			break
 		print("{} searched for:{}".format(message.author,tmc[lead+2:lag].encode("utf-8")))
 		msg = await client.send_message(message.channel, 'Searching...')
-		result = fetch.cardresult(tmc[lead+2:lag])
+		
+		if tmc[lead+2:lead+3] == "!":
+			result = fetch.cardresult(tmc[lead+3:lag], True)
+		else:
+			result = fetch.cardresult(tmc[lead+2:lag], False)
+		
 		await client.edit_message(msg, result)
 		tmc = tmc.replace(tmc[lead:lag+2],"")
 		print('sent @{}:{}'.format(message.channel, result.encode("utf-8")))

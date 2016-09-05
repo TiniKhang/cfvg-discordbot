@@ -65,7 +65,7 @@ def updatedb(confirm):
 		return(card)
 	return(-1)
 
-def fetchcard(page):
+def fetchcard(page,info):
 	r = requests.post("http://cardfight.wikia.com"+page)
 	soup = BeautifulSoup(r.content, 'html.parser', from_encoding=r.encoding)
 	table = soup.select(".cftable .info-main table")
@@ -79,15 +79,23 @@ def fetchcard(page):
 		e = effect[0].text[1:-1]
 	else:
 		e = "*No effect*"
-	return("**{}**\n*{} <<{}>> {}*\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),e))
-	
-def cardresult(text):
+		
+	img = soup.select(".cftable div div")
+	i = img[0].a.get('href')
+	i = i[:i.find(".png")+4]
+
+	if info:
+		return("**{}**\n*{} <<{}>> {}*\n{}\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),e,i))
+	else:
+		return("{} (Use '[[!' for effect)\n".format(i))
+
+def cardresult(text,info):
 	d = searchdb(text,14)
 	tmp = "Multiple Cards found (max 15 results):"
 	if len(d) == 0:
 		return("No results found")
 	elif len(d) == 1: # match found
-		for key in d: tmp = fetchcard(d[key])
+		for key in d: tmp = fetchcard(d[key],info)
 		return(tmp)
 	else:
 		for key in d: tmp += d[key][6:].replace("_"," ") + "; "
