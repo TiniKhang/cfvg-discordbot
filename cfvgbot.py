@@ -19,6 +19,7 @@ import text # words
 from fractions import *
 from Hyper_Calculator import * #Math stuff
 import getcardinfo as fetch #card fetcher
+import getepic as epic #EPIC card fetcher
 
 token = "" #Create a text file named token.key and put your token in it
 with open('token.key', 'r') as myfile:
@@ -68,11 +69,21 @@ async def on_message(message):
 		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
 		await client.send_message(message.channel, text.about)
 		print('sent @{}:{}'.format(message.author, text.about))
-	
+
+	if message.content.startswith('!'):
+		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
+		data = message.content[len('!'):].strip()
+		msg = await client.send_message(message.channel, 'Searching...')
+		if data[0:1] == "!":
+			result = epic.cardresult(data[1:],True)
+		else:
+			result = epic.cardresult(data,False)
+		await client.edit_message(msg, result)
+		print('sent @{}:{}'.format(message.channel, result.encode("utf-8")))
+
 	if message.content.startswith('vbot help'):
 		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
 		data = message.content[len('vbot help'):].strip()
-		print(data)
 		if data == [] or message.content=="vbot help":
 			tmp = "vbot help [*]\nDisplays information about the command. Commands:\n"
 			for i in text.helping: tmp += i + "\n"

@@ -1,4 +1,4 @@
-# cfvg-discordbot (Version: 0.2)
+# cfvg-discordbot (Version: 0.4)
 Discord Bot for Cardfight Vanguard
 
 ### Running locally

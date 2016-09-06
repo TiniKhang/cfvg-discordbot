@@ -54,7 +54,7 @@ def updatedb(confirm):
 			if name.find("set gallery") != -1: continue # Set Gallery:
 			card += 1
 			database[name] = link["href"]
-			#print("registered: " + str(link["href"].encode('utf-8')) )
+			print("registered: " + str(link["href"].encode('utf-8')) )
 
 		if skip: break
 		url = next[0].parent["href"]
