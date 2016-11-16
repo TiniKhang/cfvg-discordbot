@@ -29,5 +29,10 @@ Print exact odds for each # of successes
 	*1 := Population size
 	*2 := Possible successes
 	*3 := Sample size
+	''',
+	"updatedb": '''vbot updatedb [*1] `ADMIN COMMAND ONLY`
+Updates the following database:
+	epic := EpicTCG
+	cfvg := Cardfight!! Vanguard
 	'''
 }

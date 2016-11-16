@@ -20,36 +20,18 @@ def searchdb(s,maxitems):
 		return(list)
 	return({})
 
-def updatedb(confirm):
-	database = {}
-	num = 0
-	r = requests.post("http://www.epiccardgame.com/card-gallery/")
-	soup = BeautifulSoup(r.content, 'html.parser', from_encoding=r.encoding)
-	table = soup.select(".tablepress tbody tr")
+def updatedb(quiet):
 	basic = re.compile('[^0-9a-zA-Z ]+')
-	for card in table:
-		name = card.find("td",class_="column-2").text
-		reg = basic.sub('',name).lower()
-		database[reg] = {
-			"name": name,
-			"img": card.a.get("href"),
-			"cost": card.find("td",class_="column-3").text,
-			"align": card.find("td",class_="column-4").text,
-			"subtype": card.find("td",class_="column-10").text,
-			"type": card.find("td",class_="column-5").text,
-			"offense": card.find("td",class_="column-6").text,
-			"defense": card.find("td",class_="column-7").text,
-			"effect": card.find("td",class_="column-8").text
-		}
-		
-		g = card.find("td",class_="column-9").text
-		if len(g) > 0: database[reg]["effect"] += "\n `" + g + "`"
-		
-		num += 1
-		print("Registered: " + name)
+	database = {}
+	r = requests.get("http://decks.epiccardgame.com/api/public/cards")
+	jsonreq = r.json()
+	for i in jsonreq:
+		name = basic.sub('',i["name"]).lower()
+		database[name] = i
+		if not quiet: print("registered: " + name )
 	with open("epicww.db", "wb") as file:
 		pickle.dump(database,file)
-		return(num)
+		return(len(database))
 	return(-1)
 
 def cardresult(text,info):
@@ -61,9 +43,17 @@ def cardresult(text,info):
 		for name in d:
 			x = d[name]
 			if info:
-				tmp = "**"+x["name"]+" ("+x["cost"]+")**\n" + "[" + x["offense"] +" "+ x["align"]+" "+x["subtype"]+" "+x["type"]+ " " + x["defense"] + "]\n" + x["effect"]+"\n"+x["img"]+"\n"
+				tmp = "**"+x["name"]+" ("+str(x["cost"])+")**\n" + "["
+				if "offense" in x: str(x["offense"]) +" "
+				tmp += x["faction_name"]+" "
+				if "traits" in x: x["traits"].upper()+" "
+				tmp += x["type_name"]+ " "
+				if "defense" in x: str(x["defense"])
+				tmp += "]\n" + x["text"]+"\n"
+				if "discard" in x: tmp += "`" + x["discard"] + "`\n" 
+				tmp += "http://decks.epiccardgame.com" + x["imagesrc"]+"\n"
 			else:
-				tmp = x["img"] + " (Put two '!' for text)\n"
+				tmp = "http://decks.epiccardgame.com" + x["imagesrc"] + " (Put two '!' for text)\n"
 		return(tmp)
 	else:
 		for key in d: tmp += d[key]["name"] + "; "

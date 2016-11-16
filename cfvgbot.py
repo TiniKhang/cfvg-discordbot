@@ -23,21 +23,38 @@ import getepic as epic #EPIC card fetcher
 
 token = "" #Create a text file named token.key and put your token in it
 with open('token.key', 'r') as myfile:
-    token=myfile.read().replace('\n', '')
+    token = myfile.read().replace('\n', '')
 
 client = discord.Client()
 logging.basicConfig(level=logging.INFO)
+control = {} # The servers and their respective owners
 
 # Alice - July 6th at 09:46 EST
 # preferrably I'd like it to parse as: "!5,8,49,1" and also take statements like "!5,4,49,1 OR 5,49,1"
 # <<[1 - (CDF[HypergeometricDistribution[5,8,49],1] - PDF[HypergeometricDistribution[5,8,49],1]) ]
 @client.event
-async def on_message(message):
-	if message.author == client.user:
+async def on_message(m):
+	if m.author == client.user:
 		return
-		
+
+	tmc = m.content
+	rep = ""
+
+	# Admin/Owner only functions
+	if m.author == control[m.server.id]:
+		if m.content.startswith('vbot updatedb'):
+			if tmc[14:] == "cfvg":
+				print("updating cfvg database")
+				print(fetch.updatedb(True))
+			elif tmc[14:] == "epic":
+				print("updating epic database")
+				print(epic.updatedb(True))
+			else:
+				print("no database of that name. If you want vanguard type 'cfvg'. If you want EicTCG type 'epic' ")
+			return
+	
+	# @everyone functions
 	cards = 0
-	tmc = message.content
 	while True:
 		lead = tmc.find("[[")
 		if lead == -1: break
@@ -45,105 +62,86 @@ async def on_message(message):
 		if lag == -1: break
 		cards += 1
 		if cards > 5:
-			await client.send_message(message.channel, "Maximum card limit reached.")
+			await client.send_message(m.channel, "Maximum card limit reached.")
 			break
-		print("{} searched for:{}".format(message.author,tmc[lead+2:lag].encode("utf-8")))
-		msg = await client.send_message(message.channel, 'Searching...')
-		
 		if tmc[lead+2:lead+3] == "!":
 			result = fetch.cardresult(tmc[lead+3:lag], True)
 		else:
 			result = fetch.cardresult(tmc[lead+2:lag], False)
-		
-		await client.edit_message(msg, result)
+		rep = await client.send_message(m.channel, result)
 		tmc = tmc.replace(tmc[lead:lag+2],"")
-		print('sent @{}:{}'.format(message.channel, result.encode("utf-8")))
 	if cards: return
 
-	if message.content == ('Hi bot!') and message.server == None:
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		await client.send_message(message.author, "Hey ^_^")
-		print('sent @{}:{}'.format(message.author, "Hey ^_^"))
+	if m.content == ('Hi bot!') and m.server == None:
+		rep = await client.send_message(m.author, "Hey ^_^")
 
-	if message.content == ('vbot'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		await client.send_message(message.channel, text.about)
-		print('sent @{}:{}'.format(message.author, text.about))
+	if m.content == ('vbot'):
+		rep = await client.send_message(m.channel, text.about)
 
-	if message.content.startswith('!'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('!'):].strip()
-		msg = await client.send_message(message.channel, 'Searching...')
+	if m.content.startswith('!'):
+		data = m.content[len('!'):].strip()
 		if data[0:1] == "!":
 			result = epic.cardresult(data[1:],True)
 		else:
 			result = epic.cardresult(data,False)
-		await client.edit_message(msg, result)
-		print('sent @{}:{}'.format(message.channel, result.encode("utf-8")))
+		rep = await client.send_message(m.channel, result)
 
-	if message.content.startswith('vbot help'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('vbot help'):].strip()
-		if data == [] or message.content=="vbot help":
+	if m.content.startswith('vbot help'):
+		data = m.content[len('vbot help'):].strip()
+		if data == [] or m.content=="vbot help":
 			tmp = "vbot help [*]\nDisplays information about the command. Commands:\n"
 			for i in text.helping: tmp += i + "\n"
-			await client.send_message(message.channel, tmp)
-			print('sent @{}:{}'.format(message.author,tmp))
+			rep = await client.send_message(m.channel, tmp)
 		elif data in text.helping:
-			await client.send_message(message.channel, text.helping[data])
-			print('sent @{}:{}'.format(message.author, text.helping[data]))
+			rep = await client.send_message(m.channel, text.helping[data])
 		else:
-			await client.send_message(message.channel, "No command found")
-			print('sent @{}:{}'.format(message.author, "No command found"))
+			rep = await client.send_message(m.channel, "No command found")
 
-	if message.content.startswith('vbot eval'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('vbot eval'):].strip()
+	if m.content.startswith('vbot eval'):
+		data = m.content[len('vbot eval'):].strip()
 		result = interpret.parse(data)
-		await client.send_message(message.channel, '{} the result for {} is: \n{}'.format(message.author.mention,data,result))
-		print('sent @{}:{}'.format(message.author, '{} the result for {} is: \n{}'.format(message.author,data.encode("utf-8"),result)))
+		rep = await client.send_message(m.channel, '{} the result for {} is: \n{}'.format(m.author.mention,data,result))
 		
-	if message.content.startswith('vbot hgcc'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('vbot hgcc'):].strip()
+	if m.content.startswith('vbot hgcc'):
+		data = m.content[len('vbot hgcc'):].strip()
 		t = data.split(' ')
 		try:
 			result = HGCC(int(t[0]),int(t[1]),int(t[2]),int(t[3]),find=t[4])
 		except:
 			result = "ERROR"
-		await client.send_message(message.channel, '{} HGCC({},{},{},{},{})={}'.format(message.author.mention,t[2],t[1],t[0],t[3],t[4],result))
-		print('sent @{}:{}'.format(message.author, '{} HGCC({},{},{},{},{})={}'.format(message.author,t[2],t[1],t[0],t[3],t[4],result)))
+		rep = await client.send_message(m.channel, '{} HGCC({},{},{},{},{})={}'.format(m.author.mention,t[2],t[1],t[0],t[3],t[4],result))
 		
-	if message.content.startswith('vbot quickodds'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('vbot quickodds'):].strip()
+	if m.content.startswith('vbot quickodds'):
+		data = m.content[len('vbot quickodds'):].strip()
 		t = data.split(' ')
 		try:
 			result = quickodds(int(t[0]),int(t[1]),int(t[2]),int(t[3]))
 		except:
 			result = "ERROR"
-		await client.send_message(message.channel, '{} quickodds({},{},{},{})=\n{}'.format(message.author.mention,t[2],t[1],t[0],t[3],result))
-		print('sent @{}:{}'.format(message.author, '{} quickodds({},{},{},{})=\n{}'.format(message.author,t[2],t[1],t[0],t[3],result)))
+		rep = await client.send_message(m.channel, '{} quickodds({},{},{},{})=\n{}'.format(m.author.mention,t[2],t[1],t[0],t[3],result))
 		
-	if message.content.startswith('vbot cascadeodds'):
-		print("{} wrote:{}".format(message.author,message.content.encode("utf-8")))
-		data = message.content[len('vbot cascadeodds'):].strip()
+	if m.content.startswith('vbot cascadeodds'):
+		data = m.content[len('vbot cascadeodds'):].strip()
 		t = data.split(' ')
 		try:
 			result = cascadeodds(int(t[0]),int(t[1]),int(t[2]))
 		except:
 			result = "ERROR"
-		await client.send_message(message.channel, '{} cascadeodds({},{},{})=\n{}'.format(message.author.mention,t[2],t[1],t[0],result))
-		print('sent @{}:{}'.format(message.author,  '{} cascadeodds({},{},{})=\n{}'.format(message.author,t[2],t[1],t[0],result)))
-
-		
-		
-		
+		rep = await client.send_message(m.channel, '{} cascadeodds({},{},{})=\n{}'.format(m.author.mention,t[2],t[1],t[0],result))
+	
+	# Bot's response
+	if rep != "":
+		print("{} wrote:{}".format(m.author,m.content.encode("utf-8")))
+		print('responded with {}'.format(rep.content.encode("utf-8")))
+	
+	
 @client.event
 async def on_ready():
 	print('Logged in as')
 	print(client.user.name)
 	print(client.user.id)
 	print('------')
+	for c in client.servers:
+		control[c.id] = c.owner
 
 client.run(token)

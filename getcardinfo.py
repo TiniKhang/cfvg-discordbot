@@ -29,24 +29,19 @@ def db2txt():
 		return("Written to vanguard.txt")
 	return("No database found or written")
 	
-def updatedb(confirm):
-	if not confirm: return(0)
+def updatedb(quiet):
 	import sys
 	sys.setrecursionlimit(10000) #recursion limit are you kidding me?
 	database = {}
 	card = 0
-	url = "/wiki/Category:Cards"
+	page = 1
 	basic = re.compile('[^0-9a-zA-Z ]+') # remove for pretty database
-	while True:
-		skip = False
-		r = requests.post("http://cardfight.wikia.com"+url)
-		soup = BeautifulSoup(r.content, 'html.parser', from_encoding=r.encoding) #utf-8
-		next = soup.find_all(string="next 200")
-		if not next:
-			next = soup.find_all(string="previous 200")
-			skip = True
-		table = next[0].find_parent("div").select(".mw-content-ltr")[0]
-		linkset = table.select("a")
+	nextpage = True
+	while nextpage:
+		r = requests.post("http://cardfight.wikia.com/wiki/Category:Cards?page="+str(page))
+		soup = BeautifulSoup(r.content, 'html.parser', from_encoding=r.encoding) #utf-8		
+		table = soup.find_all("div", class_="mw-content-ltr")
+		linkset = table[2].select("a")
 		for link in linkset:
 			name = basic.sub('',link.string).lower()  # remove for pretty database, keep name = link.string
 			if name == "userxxtheprincexx": continue # User:XxThePrincexX
@@ -54,11 +49,10 @@ def updatedb(confirm):
 			if name.find("set gallery") != -1: continue # Set Gallery:
 			card += 1
 			database[name] = link["href"]
-			print("registered: " + str(link["href"].encode('utf-8')) )
-
-		if skip: break
-		url = next[0].parent["href"]
-		
+			if not quiet: print("registered: " + name )
+		page += 1
+		if not quiet: print("going to page" + page )
+		if len(soup.find_all("span", class_="paginator-next disabled")): nextpage = False # Quit if there is no next page
 
 	with open("vanguard.db", "wb") as file:
 		pickle.dump(database,file)
