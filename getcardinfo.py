@@ -74,9 +74,9 @@ def fetchcard(page,info):
 	else:
 		e = "*No effect*"
 		
-	img = soup.select(".cftable div div")
-	i = img[0].a.get('href')
-	i = i[:i.find(".png")+4]
+	img = soup.select(".cftable .image")
+	i = img[0].get('href')
+	i = i[:i.find("/revision")]
 
 	if info:
 		return("**{}**\n*{} <<{}>> {}*\n{}\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),e,i))
