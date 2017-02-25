@@ -45,10 +45,10 @@ async def on_message(m):
 		if m.content.startswith('vbot updatedb'):
 			if tmc[14:] == "cfvg":
 				print("updating cfvg database")
-				print(fetch.updatedb(True))
+				print(str(fetch.updatedb(True)))
 			elif tmc[14:] == "epic":
 				print("updating epic database")
-				print(epic.updatedb(True))
+				print(str(epic.updatedb(True)))
 			else:
 				print("no database of that name. If you want vanguard type 'cfvg'. If you want EicTCG type 'epic' ")
 			return
