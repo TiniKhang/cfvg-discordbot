@@ -51,7 +51,7 @@ def updatedb(quiet):
 			database[name] = link["href"]
 			if not quiet: print("registered: " + name )
 		page += 1
-		if not quiet: print("going to page" + page )
+		if not quiet: print("going to page {}".format(page) )
 		if len(soup.find_all("span", class_="paginator-next disabled")): nextpage = False # Quit if there is no next page
 
 	with open("vanguard.db", "wb") as file:
