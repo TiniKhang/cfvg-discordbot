@@ -56,20 +56,20 @@ async def on_message(m):
 	# @everyone functions
 	cards = 0
 	while True:
-		lead = tmc.find("[")
+		lead = tmc.find("[[")
 		if lead == -1: break
-		lag = tmc.find("]",lead)
+		lag = tmc.find("]]",lead)
 		if lag == -1: break
 		cards += 1
 		if cards > 5:
 			await client.send_message(m.channel, "Maximum card limit reached.")
 			break
-		if tmc[lead+1:lead+2] == "":
-			result = fetch.cardresult(tmc[lead+2:lag], True)
+		if tmc[lead+2:lead+3] == "!":
+			result = fetch.cardresult(tmc[lead+3:lag], True)
 		else:
-			result = fetch.cardresult(tmc[lead+1:lag], False)
+			result = fetch.cardresult(tmc[lead+2:lag], False)
 		rep = await client.send_message(m.channel, result)
-		tmc = tmc.replace(tmc[lead:lag+1],"")
+		tmc = tmc.replace(tmc[lead:lag+2],"")
 	if cards: return
 
 	if m.content == ('Hi bot!') and m.server == None:
