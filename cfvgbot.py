@@ -64,7 +64,7 @@ async def on_message(m):
 		if cards > 5:
 			await client.send_message(m.channel, "Maximum card limit reached.")
 			break
-		if tmc[lead+1:lead+2] == "[":
+		if tmc[lead+1:lead+2] == "!":
 			result = fetch.cardresult(tmc[lead+2:lag], True)
 		else:
 			result = fetch.cardresult(tmc[lead+1:lag], False)
@@ -78,9 +78,9 @@ async def on_message(m):
 	if m.content == ('vbot'):
 		rep = await client.send_message(m.channel, text.about)
 
-	if m.content.startswith('['):
-		data = m.content[len('['):].strip()
-		if data[0:1] == "[":
+	if m.content.startswith('!'):
+		data = m.content[len('!'):].strip()
+		if data[0:1] == "!":
 			result = epic.cardresult(data[1:],True)
 		else:
 			result = epic.cardresult(data,False)
