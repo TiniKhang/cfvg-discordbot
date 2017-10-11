@@ -78,13 +78,13 @@ async def on_message(m):
 	if m.content == ('vbot'):
 		rep = await client.send_message(m.channel, text.about)
 
-	if m.content.startswith('!'):
-		data = m.content[len('!'):].strip()
-		if data[0:1] == "!":
-			result = epic.cardresult(data[1:],True)
-		else:
-			result = epic.cardresult(data,False)
-		rep = await client.send_message(m.channel, result)
+	#if m.content.startswith('!'):
+		#data = m.content[len('!'):].strip()
+		#if data[0:1] == "!":
+		#	result = epic.cardresult(data[1:],True)
+		#else:
+		#	result = epic.cardresult(data,False)
+		#rep = await client.send_message(m.channel, result)
 
 	if m.content.startswith('vbot help'):
 		data = m.content[len('vbot help'):].strip()
