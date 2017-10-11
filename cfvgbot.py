@@ -56,9 +56,9 @@ async def on_message(m):
 	# @everyone functions
 	cards = 0
 	while True:
-		lead = tmc.find("[[")
+		lead = tmc.find("[")
 		if lead == -1: break
-		lag = tmc.find("]]",lead)
+		lag = tmc.find("]",lead)
 		if lag == -1: break
 		cards += 1
 		if cards > 5:
