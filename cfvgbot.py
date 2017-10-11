@@ -56,15 +56,15 @@ async def on_message(m):
 	# @everyone functions
 	cards = 0
 	while True:
-		lead = tmc.find("[[")
+		lead = tmc.find("[")
 		if lead == -1: break
-		lag = tmc.find("]]",lead)
+		lag = tmc.find("]",lead)
 		if lag == -1: break
 		cards += 1
 		if cards > 5:
 			await client.send_message(m.channel, "Maximum card limit reached.")
 			break
-		if tmc[lead+2:lead+3] == "!":
+		if tmc[lead+2:lead+3] == "[":
 			result = fetch.cardresult(tmc[lead+3:lag], True)
 		else:
 			result = fetch.cardresult(tmc[lead+2:lag], False)
@@ -78,13 +78,13 @@ async def on_message(m):
 	if m.content == ('vbot'):
 		rep = await client.send_message(m.channel, text.about)
 
-	#if m.content.startswith('['):
-		#data = m.content[len('['):].strip()
-		#if data[0:1] == "[":
-		#	result = epic.cardresult(data[1:],True)
-		#else:
-		#	result = epic.cardresult(data,False)
-		#rep = await client.send_message(m.channel, result)
+	if m.content.startswith('['):
+		data = m.content[len('['):].strip()
+		if data[0:1] == "[":
+			result = epic.cardresult(data[1:],True)
+		else:
+			result = epic.cardresult(data,False)
+		rep = await client.send_message(m.channel, result)
 
 	if m.content.startswith('vbot help'):
 		data = m.content[len('vbot help'):].strip()
