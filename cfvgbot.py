@@ -64,10 +64,7 @@ async def on_message(m):
 		if cards > 5:
 			await client.send_message(m.channel, "Maximum card limit reached.")
 			break
-		if tmc[lead+1:lead+2] == "!":
 			result = fetch.cardresult(tmc[lead+2:lag], True)
-		else:
-			result = fetch.cardresult(tmc[lead+1:lag], False)
 		rep = await client.send_message(m.channel, result)
 		tmc = tmc.replace(tmc[lead:lag+1],"")
 	if cards: return
