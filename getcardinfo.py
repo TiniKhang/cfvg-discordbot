@@ -81,7 +81,7 @@ def fetchcard(page,info):
 	if info:
 		return("**{}**\n*{} <<{}>> {}*\n{}\n{}\n".format(f(" Name "),f(" Grade / Skill "),f(" Clan "),f(" Power "),e,i))
 	else:
-		return("{} (Use '[!' for effect)\n".format(i))
+		return("{} (Use '[[!' for effect)\n".format(i))
 
 def cardresult(text,info):
 	d = searchdb(text,14)
